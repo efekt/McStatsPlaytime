@@ -2,10 +2,7 @@ package it.efekt.mcstatsplaytime;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class StatsGatherer {
     private List<JsonObject> stats = new ArrayList();
     private final String PLAYTIME_PROPERTY = "stat.playOneMinute";
+    private final String RESULT_FILENAME = "playtime.txt";
 
     public boolean execute(){
         try {
@@ -29,14 +27,28 @@ public class StatsGatherer {
     private void printResults(){
         int i = 1;
         MinecraftUUIDResolver resolver = new MinecraftUUIDResolver();
+        String resultString = "";
         for (JsonObject stats : this.stats) {
             String uuid = stats.get("uuid").getAsString();
             long playtime = stats.get(PLAYTIME_PROPERTY).getAsLong() / 20; // This is in Minecraft ticks, to get it in seconds, divide by 20
             long hours = TimeUnit.SECONDS.toHours(playtime);
             long minutes = TimeUnit.SECONDS.toMinutes(playtime) - (hours * 60);
-
-            System.out.println(i + ". " + resolver.getName(uuid) + ": " + hours + "h " + minutes + "m");
+            String resultLine = i + ". " + resolver.getName(uuid) + ": " + hours + "h " + minutes + "m";
+            resultString = resultString.concat(resultLine + "\n");
+            System.out.println(resultLine);
             i++;
+        }
+        try {
+            saveResultToFile(resultString);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveResultToFile(String resultString) throws FileNotFoundException {
+        try (PrintWriter out = new PrintWriter(RESULT_FILENAME)){
+            out.println(resultString);
+            System.out.println("Saved to " + RESULT_FILENAME);
         }
     }
 
