@@ -39,7 +39,7 @@ public class MinecraftUUIDResolver {
             return new JsonParser().parse(sb.toString()).getAsJsonObject();
 
         } catch (IOException exc){
-            exc.printStackTrace();
+            System.out.println("Seems like the API is offline");
         }
 
         return null;
