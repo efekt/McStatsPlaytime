@@ -40,6 +40,7 @@ public class MinecraftUUIDResolver {
 
         } catch (IOException exc){
             System.out.println("Seems like the API is offline");
+            System.exit(1);
         }
 
         return null;
